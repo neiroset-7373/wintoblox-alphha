@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WintoBlox - Регистрация</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .logo-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 1000;
+            transition: opacity 0.8s;
+        }
+        .logo-screen img {
+            width: 300px;
+            height: 300px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            display: none;
+        }
+        .logo-small {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-small img {
+            width: 120px;
+            height: 120px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #4ecca3;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #00d2d3;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #4ecca3;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #00d2d3;
+            box-shadow: 0 0 10px rgba(0,210,211,0.3);
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #4ecca3;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #45b08c;
+        }
+        .btn-secondary {
+            background: #0f3460;
+        }
+        .btn-secondary:hover {
+            background: #16213e;
+        }
+        .model-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+            display: none;
+        }
+        .model-card {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .model-card:hover, .model-card.selected {
+            border-color: #4ecca3;
+            background: rgba(78,204,163,0.2);
+        }
+        .model-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .model-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .model-desc {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .error {
+            color: #e94560;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        .success {
+            color: #00d2d3;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .auth-toggle a {
+            color: #4ecca3;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-screen" id="logoScreen">
+        <img src="/public/icons/logos/logo/wintoblox_big_logo_green_and_blue.svg" alt="WintoBlox">
+    </div>
+    
+    <div class="container" id="registrationContainer">
+        <div class="logo-small">
+            <img src="/static/icons/logos/logo/mini_logo-_2_.svg" alt="WintoBlox">
+        </div>
+        
+        <h1 id="pageTitle">Создание аккаунта</h1>
+        
+        <div id="registrationForm">
+            <div class="form-group">
+                <label for="username">Никнейм</label>
+                <input type="text" id="username" placeholder="Введите никнейм" maxlength="16">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" placeholder="Введите пароль">
+            </div>
+            
+            <div class="form-group" id="confirmPasswordGroup">
+                <label for="confirmPassword">Подтвердите пароль</label>
+                <input type="password" id="confirmPassword" placeholder="Повторите пароль">
+            </div>
+            
+            <div class="error" id="errorMsg"></div>
+            
+            <button class="btn" id="authBtn" onclick="register()">Продолжить</button>
+            
+            <div class="auth-toggle">
+                <a onclick="toggleAuth()" id="toggleLink">Уже есть аккаунт? Войти</a>
+            </div>
+        </div>
+        
+        <div class="model-selection" id="modelSelection">
+            <h2>Выберите модельку</h2>
+            
+            <div class="model-card" onclick="selectModel('bekon')">
+                <div class="model-icon">🥓</div>
+                <div class="model-name">Бекон</div>
+                <div class="model-desc">Основной персонаж</div>
+            </div>
+            
+            <div class="model-card" onclick="selectModel('cube')">
+                <div class="model-icon">⬜</div>
+                <div class="model-name">Куб</div>
+                <div class="model-desc">Простая модель</div>
+            </div>
+            
+            <button class="btn" onclick="completeRegistration()" id="startBtn" style="grid-column: span 2; margin-top: 20px;" disabled>
+                Начать играть
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Показать логотип на 3 секунды, потом регистрацию
+        setTimeout(() => {
+            document.getElementById('logoScreen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('logoScreen').style.display = 'none';
+                document.getElementById('registrationContainer').style.display = 'block';
+                
+                // Проверить сессию
+                checkSession();
+            }, 800);
+        }, 3000);
+        
+        let selectedModel = '';
+        let isLoginMode = false;
+        
+        function checkSession() {
+            fetch('/api/user')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.username && data.model) {
+                        // Уже авторизован - сразу в лобби
+                        window.location.href = '/lobby/computer';
+                    }
+                })
+                .catch(() => {
+                    // Не авторизован
+                });
+        }
+        
+        function toggleAuth() {
+            isLoginMode = !isLoginMode;
+            
+            const title = document.getElementById('pageTitle');
+            const confirmGroup = document.getElementById('confirmPasswordGroup');
+            const authBtn = document.getElementById('authBtn');
+            const toggleLink = document.getElementById('toggleLink');
+            
+            if (isLoginMode) {
+                title.textContent = 'Вход в аккаунт';
+                confirmGroup.style.display = 'none';
+                authBtn.textContent = 'Войти';
+                authBtn.onclick = login;
+                toggleLink.textContent = 'Нет аккаунта? Зарегистрироваться';
+            } else {
+                title.textContent = 'Создание аккаунта';
+                confirmGroup.style.display = 'block';
+                authBtn.textContent = 'Продолжить';
+                authBtn.onclick = register;
+                toggleLink.textContent = 'Уже есть аккаунт? Войти';
+            }
+        }
+        
+        function showError(message) {
+            const errorEl = document.getElementById('errorMsg');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => errorEl.style.display = 'none', 3000);
+        }
+        
+        function register() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!username || username.length < 3) {
+                showError('Никнейм должен быть от 3 символов');
+                return;
+            }
+            
+            if (!password || password.length < 4) {
+                showError('Пароль должен быть от 4 символов');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showError('Пароли не совпадают');
+                return;
+            }
+            
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    model: 'bekon' // временно
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    // Показать выбор модели
+                    document.getElementById('registrationForm').style.display = 'none';
+                    document.getElementById('modelSelection').style.display = 'grid';
+                }
+            })
+            .catch(err => {
+                showError('Ошибка подключения к серверу');
+                console.error(err);
+            });
+        }
+        
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('Заполните все поля');
+                return;
+            }
+            
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    // Вход успешен - в лобби
+                    window.location.href = '/lobby/computer';
+                }
+            })
+            .catch(err => {
+                showError('Ошибка подключения к серверу');
+                console.error(err);
+            });
+        }
+        
+        function selectModel(model) {
+            selectedModel = model;
+            
+            // Убрать выделение со всех карточек
+            document.querySelectorAll('.model-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Выделить выбранную
+            event.currentTarget.classList.add('selected');
+            
+            // Активировать кнопку
+            document.getElementById('startBtn').disabled = false;
+        }
+        
+        function completeRegistration() {
+            if (!selectedModel) {
+                showError('Выберите модельку');
+                return;
+            }
+            
+            // Обновить модель пользователя
+            const username = document.getElementById('username').value.trim();
+            
+            fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    username: username,
+                    password: '', // не нужно
+                    model: selectedModel
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    // В лобби
+                    window.location.href = '/lobby/computer';
+                }
+            })
+            .catch(err => {
+                showError('Ошибка соединения');
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
