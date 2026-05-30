@@ -97,9 +97,9 @@
         ceiling.position.y = roomH;
         scene.add(ceiling);
 
-        // Walls
+        // Walls with thickness
         function makeWall(w, h, x, z, ry) {
-            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.5), wallMat);
+            const wall = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.8), wallMat);
             wall.position.set(x, h / 2, z);
             wall.rotation.y = ry;
             wall.receiveShadow = true;
@@ -110,15 +110,68 @@
         makeWall(roomSize, roomH, -roomSize / 2, 0, Math.PI / 2);
         makeWall(roomSize, roomH, roomSize / 2, 0, Math.PI / 2);
 
-        // Pillars
+        // Corner pillars
         const pillarMat = new THREE.MeshStandardMaterial({ color: 0x3a2222 });
-        for (let x = -15; x <= 15; x += 15) {
-            for (let z = -15; z <= 15; z += 15) {
-                const p = new THREE.Mesh(new THREE.BoxGeometry(1.5, roomH, 1.5), pillarMat);
-                p.position.set(x, roomH / 2, z);
-                scene.add(p);
-            }
-        }
+        const corners = [[-18, -18], [18, -18], [-18, 18], [18, 18]];
+        corners.forEach(([x, z]) => {
+            const p = new THREE.Mesh(new THREE.BoxGeometry(2, roomH, 2), pillarMat);
+            p.position.set(x, roomH / 2, z);
+            p.castShadow = true;
+            scene.add(p);
+        });
+
+        // Windows (dark glass)
+        const windowMat = new THREE.MeshStandardMaterial({ color: 0x0a0a1a, emissive: 0x000033, emissiveIntensity: 0.3, transparent: true, opacity: 0.7 });
+        const windows = [
+            { x: 0, z: -20, ry: 0 },
+            { x: 0, z: 20, ry: 0 },
+            { x: -20, z: 0, ry: Math.PI / 2 },
+            { x: 20, z: 0, ry: Math.PI / 2 }
+        ];
+        windows.forEach(win => {
+            const winMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 3, 0.3), windowMat);
+            winMesh.position.set(win.x, 4, win.z);
+            winMesh.rotation.y = win.ry;
+            scene.add(winMesh);
+        });
+
+        // Interior obstacles/props
+        const obstacleMat = new THREE.MeshStandardMaterial({ color: 0x4a3333, roughness: 0.8 });
+        const obstacles = [];
+        
+        // Tables/barriers
+        const tableConfigs = [
+            { x: -10, z: -10, w: 4, d: 2, h: 1.5 },
+            { x: 10, z: -8, w: 3, d: 4, h: 1.5 },
+            { x: -8, z: 12, w: 5, d: 2, h: 1.5 },
+            { x: 12, z: 10, w: 3, d: 3, h: 1.5 },
+            { x: 0, z: 0, w: 2, d: 2, h: 3 } // tall pillar in center
+        ];
+        
+        tableConfigs.forEach(cfg => {
+            const table = new THREE.Mesh(new THREE.BoxGeometry(cfg.w, cfg.h, cfg.d), obstacleMat);
+            table.position.set(cfg.x, cfg.h / 2, cfg.z);
+            table.castShadow = true;
+            table.receiveShadow = true;
+            scene.add(table);
+            obstacles.push({ x: cfg.x, z: cfg.z, halfW: cfg.w / 2, halfD: cfg.d / 2, height: cfg.h });
+        });
+        
+        // Crates/barriers
+        const crateMat = new THREE.MeshStandardMaterial({ color: 0x5a4444 });
+        const crateConfigs = [
+            { x: -12, z: 5 },
+            { x: 15, z: -5 },
+            { x: -5, z: -15 },
+            { x: 8, z: 15 }
+        ];
+        crateConfigs.forEach(cfg => {
+            const crate = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), crateMat);
+            crate.position.set(cfg.x, 1, cfg.z);
+            crate.castShadow = true;
+            scene.add(crate);
+            obstacles.push({ x: cfg.x, z: cfg.z, halfW: 1, halfD: 1, height: 2 });
+        });
 
         // ===================== PLAYER =====================
         const player = new THREE.Group();
@@ -254,7 +307,7 @@
 
         // ===================== UPDATE =====================
         function update() {
-            const speed = 0.14;
+            const speed = 0.12;
             const forward = kDown('w') || kDown('ц');
             const back = kDown('s') || kDown('ы');
             const left = kDown('a') || kDown('ф');
@@ -277,9 +330,21 @@
             if (py < 0) { py = 0; vy = 0; }
 
             // Bounds
-            const bound = roomSize / 2 - 1;
+            const bound = roomSize / 2 - 1.5;
             px = Math.max(-bound, Math.min(bound, px));
             pz = Math.max(-bound, Math.min(bound, pz));
+
+            // Obstacle collision
+            for (const obs of obstacles) {
+                if (Math.abs(px - obs.x) < obs.halfW + 0.3 && 
+                    Math.abs(pz - obs.z) < obs.halfD + 0.3 && 
+                    py < obs.height) {
+                    // Push player away from obstacle
+                    const pushDir = Math.atan2(pz - obs.z, px - obs.x);
+                    px += Math.sin(pushDir) * 0.2;
+                    pz += Math.cos(pushDir) * 0.2;
+                }
+            }
 
             player.position.set(px, py, pz);
             torch.position.set(px, py + 2, pz);
@@ -306,11 +371,11 @@
             }
 
             // Camera
-            const cd = 7;
+            const cd = 8;
             camera.position.x = px + Math.sin(camYaw) * cd;
-            camera.position.y = py + 4;
+            camera.position.y = py + 5;
             camera.position.z = pz + Math.cos(camYaw) * cd;
-            camera.lookAt(px, py + 1, pz);
+            camera.lookAt(px, py + 1.5, pz);
         }
 
         function animate() {

@@ -128,13 +128,22 @@
         const fz = new THREE.Mesh(new THREE.PlaneGeometry(14, 3), fm);
         fz.rotation.x = -Math.PI / 2; fz.position.set(0, 0.02, 65); scene.add(fz);
 
-        // Obstacles
+        // Obstacles - varied positions
         const obsMat = new THREE.MeshStandardMaterial({ color: 0x8b0000, emissive: 0x8b0000, emissiveIntensity: 0.3 });
         const obstacles = [];
-        [12, 22, 32, 42, 52].forEach(z => {
-            const obs = new THREE.Mesh(new THREE.BoxGeometry(2, 0.8, 0.3), obsMat);
-            obs.position.set(0, 0.4, z); scene.add(obs);
-            obstacles.push({ z: z, xRange: 1.2 });
+        // Obstacles at different X positions
+        const obsConfigs = [
+            { z: 12, x: -3, width: 2 },
+            { z: 22, x: 2, width: 1.5 },
+            { z: 32, x: 0, width: 2.5 },
+            { z: 42, x: -4, width: 1.8 },
+            { z: 52, x: 3, width: 2 },
+            { z: 58, x: -2, width: 1.5 }
+        ];
+        obsConfigs.forEach(cfg => {
+            const obs = new THREE.Mesh(new THREE.BoxGeometry(cfg.width, 0.8, 0.3), obsMat);
+            obs.position.set(cfg.x, 0.4, cfg.z); scene.add(obs);
+            obstacles.push({ z: cfg.z, x: cfg.x, width: cfg.width / 2 });
         });
 
         // Player (Bekon)
@@ -308,8 +317,9 @@
                     return;
                 }
                 const angle = Math.atan2(dx, dz) + camYaw;
-                px += Math.sin(angle) * 0.08;
-                pz += Math.cos(angle) * 0.08;
+                // Slower speed: 0.05 instead of 0.08
+                px += Math.sin(angle) * 0.05;
+                pz += Math.cos(angle) * 0.05;
                 player.rotation.y = -angle;
             }
 
@@ -318,12 +328,16 @@
             vy -= 0.008; py += vy;
             if (py < 0) { py = 0; vy = 0; }
 
-            // Obstacle collision
+            // Obstacle collision - check if player is at obstacle Z and X position
             for (const obs of obstacles) {
-                if (Math.abs(pz - obs.z) < 0.5 && Math.abs(px) < obs.xRange && py < 0.5) {
-                    pz = obs.z - 0.6;
+                if (Math.abs(pz - obs.z) < 0.6 && Math.abs(px - obs.x) < obs.width && py < 0.6) {
+                    // Push player back
+                    pz = obs.z - 0.8;
                 }
             }
+
+            // Wall bounds
+            px = Math.max(-7, Math.min(7, px));
 
             player.position.set(px, py, pz);
 
@@ -341,10 +355,11 @@
         function anim() {
             requestAnimationFrame(anim);
             update();
-            camera.position.x = Math.sin(camYaw) * 8;
+            // Camera follows player
+            camera.position.x = px + Math.sin(camYaw) * 8;
             camera.position.z = pz - 6;
             camera.position.y = 5;
-            camera.lookAt(0, 1, pz + 4);
+            camera.lookAt(px, 1, pz + 4);
             renderer.render(scene, camera);
         }
         sched();
