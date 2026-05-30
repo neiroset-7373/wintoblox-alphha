@@ -50,7 +50,7 @@ jobs:
           cd android
           sed -i "s/minSdkVersion = .*/minSdkVersion = 26/" variables.gradle
           sed -i "s/targetSdkVersion = .*/targetSdkVersion = 34/" variables.gradle
-          sed -i "s/compileSdkVersion = .*/compileSdkVersion = 34/" variables.gradle
+          sed -i "s/compileSdkVersion = .*/compileSdkVersion = 35/" variables.gradle
           cat variables.gradle
 
       - name: Build Android APK
