@@ -37,8 +37,7 @@ jobs:
         run: npm install -D typescript
 
       - name: Init Capacitor
-        run: |
-          npx cap init "WintoBlox - Alpha Version" org.wintozo.wintoblox --web-dir client/version\ 0.1.0-alpha/static --npm-client npm
+        run: npx cap init "WintoBlox - Alpha Version" org.wintozo.wintoblox --web-dir "client/version 0.1.0-alpha/static"
 
       - name: Add Android Platform
         run: npx cap add android
