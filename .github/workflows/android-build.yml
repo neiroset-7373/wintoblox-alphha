@@ -51,7 +51,20 @@ jobs:
           sed -i "s/minSdkVersion = .*/minSdkVersion = 26/" variables.gradle
           sed -i "s/targetSdkVersion = .*/targetSdkVersion = 34/" variables.gradle
           sed -i "s/compileSdkVersion = .*/compileSdkVersion = 35/" variables.gradle
-          cat variables.gradle
+
+      - name: Fix Kotlin duplicate classes
+        run: |
+          cd android
+          cat >> app/build.gradle << 'EOF'
+          configurations.all {
+              resolutionStrategy {
+                  force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.20'
+                  force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.20'
+                  force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.20'
+              }
+          }
+          EOF
+          cat app/build.gradle
 
       - name: Build Android APK
         run: |
