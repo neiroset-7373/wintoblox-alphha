@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WintoBlox - Alpha</title>
+    <title>WintoBlox - Выбор устройства</title>
     <link rel="stylesheet" href="../static/css/vibor-ystroistva.css">
 </head>
 <body>
@@ -15,11 +15,11 @@
             <h1 class="vibor-title">WintoBlox</h1>
             <p class="vibor-subtitle">Выберите ваше устройство</p>
             <div class="vibor-buttons">
-                <button class="vibor-btn" onclick="window.location.href='wintoblox-lobby.html'">
+                <button class="vibor-btn" onclick="selectDevice('computer')">
                     <img src="../static/icons/logos/computer.svg" alt="Компьютер">
                     <span>Компьютер</span>
                 </button>
-                <button class="vibor-btn" onclick="window.location.href='wintoblox-mobile-lobby-menu.html'">
+                <button class="vibor-btn" onclick="selectDevice('mobile')">
                     <img src="../static/icons/logos/phone.svg" alt="Телефон">
                     <span>Телефон</span>
                 </button>
@@ -43,7 +43,7 @@
         // Если уже выбрано - сразу перенаправляем
         const saved = localStorage.getItem('wintoblox-device');
         if (saved) {
-            window.location.href = 'wintoblox-mobile-lobby-menu.html';
+            window.location.href = '/lobby/' + saved;
         }
     </script>
 </body>

@@ -51,7 +51,7 @@
             background: rgba(255,255,255,0.1); border-radius: 3px; z-index: 10;
         }
         #pfill { height: 100%; background: #4ecca3; border-radius: 3px; width: 0%; transition: width 0.2s; }
-        
+        {% if device == 'mobile' %}
         #mob { position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 100; }
         .mob-row { display: flex; gap: 6px; }
         .mb { width: 60px; height: 60px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; color: white; font-size: 22px; cursor: pointer; user-select: none; touch-action: manipulation; }
@@ -59,7 +59,7 @@
         .mb img { width: 24px; height: 24px; pointer-events: none; filter: brightness(0) invert(1); }
         #mbJump { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: rgba(233,69,96,0.4); border: 2px solid rgba(233,69,96,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; z-index: 100; cursor: pointer; user-select: none; }
         #mbJump:active { background: rgba(233,69,96,0.7); }
-        
+        {% endif %}
     </style>
 </head>
 <body>
@@ -71,7 +71,7 @@
     </div>
     <div id="msg"></div>
     <div id="pbar"><div id="pfill"></div></div>
-    
+    {% if device == 'mobile' %}
     <div id="mob">
         <button class="mb" id="mbW"><img src="../../static/ypravlenie_knopki_strelki/vverh.svg"></button>
         <div class="mob-row">
@@ -81,10 +81,9 @@
         </div>
     </div>
     <button id="mbJump">ПРЫЖОК</button>
-    
+    {% endif %}
 
-    <script src="../../static/js/lib/three.min.js"></script>
-    <script src="../..../../static/models/lib/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script>
         const scene = new THREE.Scene();
@@ -282,7 +281,7 @@
         }, { passive: false });
         renderer.domElement.addEventListener('touchend', () => isMD = false);
 
-        
+        {% if device == 'mobile' %}
         function mobBtn(id, k) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -296,7 +295,7 @@
             el.addEventListener('mouseleave', up);
         }
         mobBtn('mbW', 'ц'); mobBtn('mbA', 'ф'); mobBtn('mbS', 'ы'); mobBtn('mbD', 'в'); mobBtn('mbJump', ' ');
-        
+        {% endif %}
 
         function update() {
             if (over || won) return;
