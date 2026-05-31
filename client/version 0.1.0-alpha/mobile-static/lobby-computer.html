@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WintoBlox - Лобби</title>
-    <link rel="stylesheet" href="../static/css/wintoblox-lobby.css">
+    <link rel="stylesheet" href="wintoblox-lobby.css">
 </head>
 <body>
     <div id="custom-cursor">
-        <img src="../static/icons/control/mouse.svg" alt="cursor">
+        <img src="icons/control/mouse.svg" alt="cursor">
     </div>
 
     <div class="lobby-container">
         <div class="logo-container">
-            <img src="../static/icons/logos/logo/bolshoe_logo.svg" alt="WintoBlox" class="main-logo" id="mainLogo">
+            <img src="icons/logos/logo/bolshoe_logo.svg" alt="WintoBlox" class="main-logo" id="mainLogo">
         </div>
 
         <div class="lobby-header">
@@ -33,14 +33,14 @@
             <div class="game-card">
                 <div class="game-title">Побег от Бр Бр Патапима</div>
                 <div class="game-desc">Убегай от монстра!</div>
-                <button class="play-btn" onclick="playGame('computer', 'pobeg_vmesto_obby_wintoblox')">
+                <button class="play-btn" onclick="playGame('pobeg_vmesto_obby_wintoblox')">
                     <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="white"/></svg>
                 </button>
             </div>
             <div class="game-card">
                 <div class="game-title">Красный цвет, зеленый цвет</div>
                 <div class="game-desc">3D игра в кальмара</div>
-                <button class="play-btn" onclick="playGame('computer', 'kalmara')">
+                <button class="play-btn" onclick="playGame('kalmara')">
                     <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" fill="white"/></svg>
                 </button>
             </div>
@@ -63,8 +63,8 @@
         const skins = ['#4ecca3', '#e94560', '#0f3460', '#00d2d3', '#ffd700'];
         const skinNames = ['Default', 'Red', 'Blue', 'Green', 'Gold'];
 
-        function playGame(device, gameId) {
-            window.location.href = '../static/games/' + device + '/' + gameId;
+        function playGame(gameId) {
+            window.location.href = 'games/' + gameId + '.html';
         }
 
         function changeSkin() {
@@ -78,13 +78,13 @@
 
         function resetDevice() {
             localStorage.removeItem('wintoblox-device');
-            window.location.href = '/';
+            window.location.href = 'index.html';
         }
 
         // Смена большого логотипа каждые 2:33 (153 секунды)
         const logos = [
-            '../static/icons/logos/logo/bolshoe_logo.svg',
-            '../static/icons/logos/logo/wintoblox_big_logo_green_and_blue.svg'
+            'icons/logos/logo/bolshoe_logo.svg',
+            'icons/logos/logo/wintoblox_big_logo_green_and_blue.svg'
         ];
         let logoIdx = 0;
         setInterval(() => {

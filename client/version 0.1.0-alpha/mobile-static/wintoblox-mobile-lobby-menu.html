@@ -4,63 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>WintoBlox Mobile</title>
-    <link rel="stylesheet" href="css/wintoblox-mobile-lobby-menu.css">
-    <style>
-        .model-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .model-icon-small {
-            font-size: 20px;
-        }
-        .change-model-btn {
-            background: none;
-            border: 1px solid #4ecca3;
-            color: #4ecca3;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="static/css/wintoblox-mobile-lobby-menu.css">
 </head>
 <body>
     <div class="lobby-container mobile">
         <div class="logo-container">
-            <img src="icons/logos/logo/mini_logo-_2_.svg" alt="WintoBlox" class="mobile-logo" id="mobileLogo">
+            <img src="static/icons/logos/logo/mini_logo-_2_.svg" alt="WintoBlox" class="mobile-logo" id="mobileLogo">
         </div>
 
         <div class="lobby-header">
             <div class="user-info">
-                <div class="user-avatar" id="userAvatar">?</div>
-                <div>
-                    <span class="user-name" id="usernameDisplay">User</span>
-                    <div class="model-display">
-                        <span class="model-icon-small" id="modelIcon">⬜</span>
-                        <span id="modelName">Не выбрана</span>
-                        <button class="change-model-btn" onclick="changeModel()">Сменить</button>
-                    </div>
-                </div>
+                <div class="user-avatar" id="userAvatar">D</div>
+                <span class="user-name">User</span>
             </div>
-            <button class="device-btn" onclick="resetDevice()">Сменить устройство</button>
+            <button class="device-btn" onclick="resetDevice()">Сменить</button>
         </div>
 
         <div class="skin-notification" id="skinNotif"></div>
 
         <div class="games-list">
-            <div class="game-card" onclick="playGame('pobeg_vmesto_obby_wintoblox')">
+            <div class="game-card" onclick="playGame('mobile', 'pobeg_vmesto_obby_wintoblox')">
                 <div class="game-info">
                     <div class="game-title">Побег от Бр Бр Патапима</div>
                     <div class="game-desc">Убегай от монстра!</div>
                 </div>
                 <div class="play-icon-small">▶</div>
             </div>
-            <div class="game-card" onclick="playGame('kalmara')">
+            <div class="game-card" onclick="playGame('mobile', 'kalmara')">
                 <div class="game-info">
                     <div class="game-title">Красный/Зеленый</div>
                     <div class="game-desc">3D игра в кальмара</div>
@@ -78,64 +48,11 @@
 
         <div class="lobby-footer">
             <button class="studio-btn" disabled>Winto Studio</button>
-            <button class="logout-btn" onclick="logout()" style="background: #e94560; margin-top: 10px;">Выйти</button>
         </div>
     </div>
 
     <script>
-        // Проверка регистрации
-        function checkAuth() {
-            const user = localStorage.getItem('winto-user');
-            const model = localStorage.getItem('winto-model');
-            
-            if (!user || !model) {
-                window.location.href = 'registration.html';
-                return false;
-            }
-            return true;
-        }
-
-        // Загрузка данных пользователя
-        function loadUserData() {
-            if (!checkAuth()) return;
-            
-            try {
-                const userData = JSON.parse(localStorage.getItem('winto-user'));
-                const model = localStorage.getItem('winto-model');
-                
-                // Отобразить никнейм
-                document.getElementById('usernameDisplay').textContent = userData.username;
-                
-                // Отобразить аватар (первая буква ника)
-                const avatar = document.getElementById('userAvatar');
-                avatar.textContent = userData.username.charAt(0).toUpperCase();
-                
-                // Отобразить модель
-                const modelIcon = document.getElementById('modelIcon');
-                const modelName = document.getElementById('modelName');
-                
-                if (model === 'bekon') {
-                    modelIcon.textContent = '🥓';
-                    modelName.textContent = 'Бекон';
-                } else if (model === 'cube') {
-                    modelIcon.textContent = '⬜';
-                    modelName.textContent = 'Куб';
-                }
-                
-                // Цвет аватара на основе ника
-                const colors = ['#4ecca3', '#e94560', '#0f3460', '#00d2d3', '#ffd700'];
-                const hash = userData.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                avatar.style.backgroundColor = colors[hash % colors.length];
-                
-            } catch (e) {
-                console.error('Error loading user data:', e);
-                localStorage.clear();
-                window.location.href = 'registration.html';
-            }
-        }
-
-        function playGame(gameId) {
-            if (!checkAuth()) return;
+        function playGame(device, gameId) {
             window.location.href = 'games/' + gameId + '.html';
         }
 
@@ -144,16 +61,9 @@
             const idx = Math.floor(Math.random() * colors.length);
             document.getElementById('userAvatar').style.backgroundColor = colors[idx];
             const notif = document.getElementById('skinNotif');
-            notif.textContent = 'Цвет изменен!';
+            notif.textContent = 'Скин изменен!';
             notif.style.display = 'block';
             setTimeout(() => notif.style.display = 'none', 1500);
-        }
-
-        function changeModel() {
-            if (!checkAuth()) return;
-            // Просто очищаем модель и переходим к выбору
-            localStorage.removeItem('winto-model');
-            window.location.href = 'registration.html#model';
         }
 
         function resetDevice() {
@@ -161,19 +71,7 @@
             window.location.href = '/';
         }
 
-        function logout() {
-            if (confirm('Вы уверены, что хотите выйти?')) {
-                localStorage.clear();
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-            loadUserData();
-            document.getElementById('userAvatar').addEventListener('click', changeSkin);
-        });
+        document.getElementById('userAvatar').addEventListener('click', changeSkin);
     </script>
 </body>
 </html>

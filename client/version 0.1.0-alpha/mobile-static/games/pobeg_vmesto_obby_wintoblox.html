@@ -31,7 +31,7 @@
         }
         #dead h1 { font-size: 50px; margin-bottom: 20px; }
         #dead button { padding: 15px 40px; font-size: 20px; background: white; color: darkred; border: none; border-radius: 12px; cursor: pointer; }
-        {% if device == 'mobile' %}
+        
         #mob { position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; z-index: 100; }
         .mob-row { display: flex; gap: 6px; }
         .mb { width: 60px; height: 60px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.3); border-radius: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; touch-action: manipulation; }
@@ -39,26 +39,26 @@
         .mb img { width: 24px; height: 24px; pointer-events: none; filter: brightness(0) invert(1); }
         #mbJump { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: rgba(233,69,96,0.4); border: 2px solid rgba(233,69,96,0.7); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; z-index: 100; cursor: pointer; user-select: none; }
         #mbJump:active { background: rgba(233,69,96,0.7); }
-        {% endif %}
+        
     </style>
 </head>
 <body>
     <div id="ui"><button onclick="location.href='/lobby/{{ device }}'">← Выход</button></div>
     <div id="hud">УБЕГАЙ ОТ ПАТАПИМА!<br><small>WASD + Пробел | Мышь — камера</small></div>
     <div id="dead"><h1>ТЫ ПОЙМАН!</h1><button onclick="location.reload()">ПОПРОБОВАТЬ СНОВА</button></div>
-    {% if device == 'mobile' %}
+    
     <div id="mob">
-        <button class="mb" id="mbW"><img src="../..static/ypravlenie_knopki_strelki/vverh.svg"></button>
+        <button class="mb" id="mbW"><img src="../../static/ypravlenie_knopki_strelki/vverh.svg"></button>
         <div class="mob-row">
-            <button class="mb" id="mbA"><img src="../..static/ypravlenie_knopki_strelki/vleva.svg"></button>
-            <button class="mb" id="mbS"><img src="../..static/ypravlenie_knopki_strelki/vniz.svg"></button>
-            <button class="mb" id="mbD"><img src="../..static/ypravlenie_knopki_strelki/vprava.svg"></button>
+            <button class="mb" id="mbA"><img src="../../static/ypravlenie_knopki_strelki/vleva.svg"></button>
+            <button class="mb" id="mbS"><img src="../../static/ypravlenie_knopki_strelki/vniz.svg"></button>
+            <button class="mb" id="mbD"><img src="../../static/ypravlenie_knopki_strelki/vprava.svg"></button>
         </div>
     </div>
     <button id="mbJump">ПРЫЖОК</button>
-    {% endif %}
+    
 
-    <audio id="bgMusic" src="../..static/models/patapim/brrr-brrr-patapim.mp3" loop></audio>
+    <audio id="bgMusic" src="../../static/models/patapim/brrr-brrr-patapim.mp3" loop></audio>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -181,7 +181,7 @@
         player.add(fallback);
 
         if (typeof THREE.GLTFLoader !== 'undefined') {
-            new THREE.GLTFLoader().load('../..static/models/source/model_1.glb', (gltf) => {
+            new THREE.GLTFLoader().load('/static/models/source/model_1.glb', (gltf) => {
                 player.remove(fallback);
                 const model = gltf.scene;
                 const box = new THREE.Box3().setFromObject(model);
@@ -203,7 +203,7 @@
         patapim.add(patFallback);
 
         if (typeof THREE.GLTFLoader !== 'undefined') {
-            new THREE.GLTFLoader().load('../..static/models/patapim/brr_brr_patapim.glb', (gltf) => {
+            new THREE.GLTFLoader().load('/static/models/patapim/brr_brr_patapim.glb', (gltf) => {
                 patapim.remove(patFallback);
                 const model = gltf.scene;
                 const box = new THREE.Box3().setFromObject(model);
@@ -289,7 +289,7 @@
         }, { passive: false });
         renderer.domElement.addEventListener('touchend', () => isMD = false);
 
-        {% if device == 'mobile' %}
+        
         function mobBtn(id, k) {
             const el = document.getElementById(id);
             if (!el) return;
@@ -303,7 +303,7 @@
             el.addEventListener('mouseleave', up);
         }
         mobBtn('mbW', 'ц'); mobBtn('mbA', 'ф'); mobBtn('mbS', 'ы'); mobBtn('mbD', 'в'); mobBtn('mbJump', ' ');
-        {% endif %}
+        
 
         // ===================== UPDATE =====================
         function update() {
@@ -393,4 +393,3 @@
     </script>
 </body>
 </html>
-
