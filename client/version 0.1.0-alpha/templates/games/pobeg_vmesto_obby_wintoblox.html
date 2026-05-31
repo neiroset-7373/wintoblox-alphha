@@ -219,9 +219,8 @@
         }
         patapim.position.set(15, 0, 15);
 
-        // ===================== STATE =====================
-        let px = 0, pz = 0, py = 0, vy = 0;
-        let camYaw = Math.PI;
+        // ===================== CAMERA =====================
+        let camYaw = Math.PI, camPitch = 0.3;
         const keys = {};
         const music = document.getElementById('bgMusic');
 
@@ -232,20 +231,17 @@
             const key = e.key.toLowerCase();
             const code = e.code;
             
-            // Map physical keys to logical actions (independent of keyboard layout)
             if (code === 'KeyW' || code === 'ArrowUp') keys['w'] = true;
             if (code === 'KeyA' || code === 'ArrowLeft') keys['a'] = true;
             if (code === 'KeyS' || code === 'ArrowDown') keys['s'] = true;
             if (code === 'KeyD' || code === 'ArrowRight') keys['d'] = true;
             if (code === 'Space') keys[' '] = true;
             
-            // Russian layout support
             if (key === 'ц' || key === 'w') keys['ц'] = true;
             if (key === 'ф' || key === 'a') keys['ф'] = true;
             if (key === 'ы' || key === 's') keys['ы'] = true;
             if (key === 'в' || key === 'd') keys['в'] = true;
             
-            // Also set the original key for compatibility
             keys[key] = true;
         });
         
@@ -267,25 +263,35 @@
             keys[key] = false;
         });
 
-        // Mouse camera
-        let isMD = false, lX;
-        renderer.domElement.addEventListener('mousedown', e => { isMD = true; lX = e.clientX; });
+        // Mouse camera with pitch
+        let isMD = false, lX, lY;
+        renderer.domElement.addEventListener('mousedown', e => { 
+            isMD = true; 
+            lX = e.clientX;
+            lY = e.clientY;
+        });
         window.addEventListener('mousemove', e => {
             if (!isMD) return;
-            camYaw -= (e.clientX - lX) * 0.008;
+            camYaw -= (e.clientX - lX) * 0.005;
+            camPitch += (e.clientY - lY) * 0.003;
+            camPitch = Math.max(-0.5, Math.min(1.2, camPitch));
             lX = e.clientX;
+            lY = e.clientY;
         });
         window.addEventListener('mouseup', () => isMD = false);
 
         // Touch camera
         renderer.domElement.addEventListener('touchstart', e => {
             if (e.target.closest('.mb') || e.target.id === 'mbJump') return;
-            if (e.touches.length === 1) { isMD = true; lX = e.touches[0].clientX; }
+            if (e.touches.length === 1) { isMD = true; lX = e.touches[0].clientX; lY = e.touches[0].clientY; }
         }, { passive: false });
         renderer.domElement.addEventListener('touchmove', e => {
             if (!isMD || e.touches.length !== 1) return;
-            camYaw -= (e.touches[0].clientX - lX) * 0.01;
+            camYaw -= (e.touches[0].clientX - lX) * 0.008;
+            camPitch += (e.touches[0].clientY - lY) * 0.005;
+            camPitch = Math.max(-0.5, Math.min(1.2, camPitch));
             lX = e.touches[0].clientX;
+            lY = e.touches[0].clientY;
         }, { passive: false });
         renderer.domElement.addEventListener('touchend', () => isMD = false);
 
@@ -370,12 +376,14 @@
                 document.getElementById('dead').style.display = 'flex';
             }
 
-            // Camera
-            const cd = 8;
-            camera.position.x = px + Math.sin(camYaw) * cd;
-            camera.position.y = py + 5;
-            camera.position.z = pz + Math.cos(camYaw) * cd;
-            camera.lookAt(px, py + 1.5, pz);
+            // Camera - follows player with pitch control
+            const cd = 7;
+            const ch = 3 + Math.sin(camPitch) * 4;
+            const cdist = Math.cos(camPitch) * cd;
+            camera.position.x = px + Math.sin(camYaw) * cdist;
+            camera.position.y = py + ch;
+            camera.position.z = pz + Math.cos(camYaw) * cdist;
+            camera.lookAt(px, py + 1.2, pz);
         }
 
         function animate() {

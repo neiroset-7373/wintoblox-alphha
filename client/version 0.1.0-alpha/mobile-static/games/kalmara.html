@@ -128,7 +128,39 @@
         const fz = new THREE.Mesh(new THREE.PlaneGeometry(14, 3), fm);
         fz.rotation.x = -Math.PI / 2; fz.position.set(0, 0.02, 65); scene.add(fz);
 
-        // Obstacles - varied positions
+        // Lasers - red beams to jump over
+        const laserMat = new THREE.MeshStandardMaterial({ 
+            color: 0xff0000, 
+            emissive: 0xff0000, 
+            emissiveIntensity: 0.8,
+            transparent: true,
+            opacity: 0.7
+        });
+        const lasers = [];
+        const laserConfigs = [
+            { z: 18, height: 0.6 },
+            { z: 28, height: 0.8 },
+            { z: 38, height: 0.5 },
+            { z: 48, height: 0.9 },
+            { z: 55, height: 0.7 }
+        ];
+        laserConfigs.forEach(cfg => {
+            // Laser beam
+            const laser = new THREE.Mesh(new THREE.BoxGeometry(14, 0.08, 0.08), laserMat);
+            laser.position.set(0, cfg.height, cfg.z);
+            scene.add(laser);
+            
+            // Laser emitters (walls)
+            const leftEmitter = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), laserMat);
+            leftEmitter.position.set(-7, cfg.height, cfg.z);
+            scene.add(leftEmitter);
+            
+            const rightEmitter = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), laserMat);
+            rightEmitter.position.set(7, cfg.height, cfg.z);
+            scene.add(rightEmitter);
+            
+            lasers.push({ z: cfg.z, height: cfg.height, active: true });
+        });
         const obsMat = new THREE.MeshStandardMaterial({ color: 0x8b0000, emissive: 0x8b0000, emissiveIntensity: 0.3 });
         const obstacles = [];
         // Obstacles at different X positions
@@ -177,6 +209,16 @@
         rl.position.set(0, 3.2, -1); scene.add(rl);
         const gl = new THREE.Mesh(new THREE.SphereGeometry(0.35, 16, 16), new THREE.MeshStandardMaterial({ color: 0x00ff00, emissive: 0x00ff00, emissiveIntensity: 1 }));
         gl.position.set(0, 2.2, -1); scene.add(gl);
+
+        // Instructions
+        const inst = new THREE.Mesh(new THREE.PlaneGeometry(12, 2), new THREE.MeshBasicMaterial({ 
+            color: 0xffffff, 
+            transparent: true, 
+            opacity: 0.3,
+            side: THREE.DoubleSide
+        }));
+        inst.position.set(0, 1.5, 10);
+        scene.add(inst);
 
         // Game state
         let px = 0, pz = 2, py = 0, vy = 0;
@@ -327,6 +369,15 @@
             if (kDown(' ') && py <= 0.05) { vy = 0.18; keys[' '] = false; }
             vy -= 0.008; py += vy;
             if (py < 0) { py = 0; vy = 0; }
+
+            // Laser collision - must jump over!
+            for (const laser of lasers) {
+                if (Math.abs(pz - laser.z) < 0.4 && py < laser.height + 0.1) {
+                    over = true;
+                    showMsg('💀 Ты проиграл!<br>Лазер тебя сжег!');
+                    return;
+                }
+            }
 
             // Obstacle collision - check if player is at obstacle Z and X position
             for (const obs of obstacles) {
