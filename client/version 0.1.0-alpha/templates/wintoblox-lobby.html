@@ -5,38 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WintoBlox - Лобби</title>
     <link rel="stylesheet" href="/static/css/wintoblox-lobby.css">
-    <style>
-        .model-display {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .model-icon-small {
-            font-size: 20px;
-        }
-        .change-model-btn {
-            background: none;
-            border: 1px solid #4ecca3;
-            color: #4ecca3;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        .logout-btn {
-            background: #e94560;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 <body>
     <div id="custom-cursor">
@@ -50,20 +18,12 @@
 
         <div class="lobby-header">
             <div class="user-info">
-                <div class="user-avatar" id="userAvatar">?</div>
-                <div>
-                    <span class="user-name" id="usernameDisplay">User</span>
-                    <div class="model-display">
-                        <span class="model-icon-small" id="modelIcon">⬜</span>
-                        <span id="modelName">Не выбрана</span>
-                        <button class="change-model-btn" onclick="changeModel()">Сменить</button>
-                    </div>
-                </div>
+                <div class="user-avatar" id="userAvatar">D</div>
+                <span class="user-name">User</span>
             </div>
             <div class="header-buttons">
                 <button class="skin-btn" onclick="changeSkin()">Сменить скин</button>
                 <button class="device-btn" onclick="resetDevice()">Сменить устройство</button>
-                <button class="logout-btn" onclick="logout()">Выйти</button>
             </div>
         </div>
 
@@ -99,84 +59,26 @@
     </div>
 
     <script>
-        // Проверка авторизации
-        function checkAuth() {
-            fetch('/api/user')
-                .then(res => {
-                    if (res.status === 401) {
-                        window.location.href = '/registration';
-                        return null;
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    if (!data) return;
-                    loadUserData(data);
-                })
-                .catch(err => {
-                    console.error('Auth error:', err);
-                    window.location.href = '/registration';
-                });
-        }
-
-        function loadUserData(userData) {
-            // Отобразить никнейм
-            document.getElementById('usernameDisplay').textContent = userData.username;
-            
-            // Отобразить аватар (первая буква ника)
-            const avatar = document.getElementById('userAvatar');
-            avatar.textContent = userData.username.charAt(0).toUpperCase();
-            
-            // Отобразить модель
-            const modelIcon = document.getElementById('modelIcon');
-            const modelName = document.getElementById('modelName');
-            
-            if (userData.model === 'bekon') {
-                modelIcon.textContent = '🥓';
-                modelName.textContent = 'Бекон';
-            } else if (userData.model === 'cube') {
-                modelIcon.textContent = '⬜';
-                modelName.textContent = 'Куб';
-            }
-            
-            // Цвет аватара на основе ника
-            const colors = ['#4ecca3', '#e94560', '#0f3460', '#00d2d3', '#ffd700'];
-            const hash = userData.username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            avatar.style.backgroundColor = colors[hash % colors.length];
-        }
+        let skinIndex = 0;
+        const skins = ['#4ecca3', '#e94560', '#0f3460', '#00d2d3', '#ffd700'];
+        const skinNames = ['Default', 'Red', 'Blue', 'Green', 'Gold'];
 
         function playGame(device, gameId) {
             window.location.href = '/game/' + device + '/' + gameId;
         }
 
         function changeSkin() {
-            const colors = ['#4ecca3', '#e94560', '#0f3460', '#00d2d3', '#ffd700'];
-            const idx = Math.floor(Math.random() * colors.length);
-            document.getElementById('userAvatar').style.backgroundColor = colors[idx];
+            skinIndex = (skinIndex + 1) % skins.length;
+            document.getElementById('userAvatar').style.backgroundColor = skins[skinIndex];
             const notif = document.getElementById('skinNotif');
-            notif.textContent = 'Цвет изменен!';
+            notif.textContent = 'Скин: ' + skinNames[skinIndex];
             notif.style.display = 'block';
             setTimeout(() => notif.style.display = 'none', 1500);
-        }
-
-        function changeModel() {
-            if (confirm('Сменить модельку? Вы перейдете на страницу выбора модели.')) {
-                window.location.href = '/registration#model';
-            }
         }
 
         function resetDevice() {
             localStorage.removeItem('wintoblox-device');
             window.location.href = '/';
-        }
-
-        function logout() {
-            if (confirm('Вы уверены, что хотите выйти?')) {
-                fetch('/api/logout', { method: 'POST' })
-                    .then(() => {
-                        window.location.href = '/';
-                    });
-            }
         }
 
         // Смена большого логотипа каждые 2:33 (153 секунды)
@@ -197,9 +99,6 @@
             cursor.style.top = e.clientY + 'px';
         });
         document.body.style.cursor = 'none';
-
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', checkAuth);
     </script>
 </body>
 </html>
